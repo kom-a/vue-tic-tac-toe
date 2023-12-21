@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import { isJSDocThrowsTag } from 'typescript';
 import { ref } from 'vue';
 
 let cells = ref([
@@ -10,6 +11,7 @@ let cells = ref([
 
 let currentMove = 'X';
 let gameOver = false;
+let winner = '';
 
 const isWinner = () => {
     const winlines = [
@@ -35,6 +37,15 @@ const isWinner = () => {
     return false;
 };
 
+const isDraw = () => {
+    for(const cell of cells.value) {
+        if(cell == '')
+            return false;
+    }
+
+    return true;
+}
+
 const move = (i: number) => {
     if (gameOver)
         return;
@@ -45,7 +56,12 @@ const move = (i: number) => {
 
     if (isWinner()) {
         gameOver = true;
+        winner = currentMove;
         return;
+    }
+    else if(isDraw()) {
+        gameOver = true;
+        winner = '';
     }
 
     currentMove = currentMove == 'X' ? 'O' : 'X';
@@ -83,7 +99,8 @@ const restart = () => {
     </div>
     <h3 v-if="!gameOver">{{ currentMove }} your turn!</h3>
     <div id="restart" v-if="gameOver">
-        <h3>{{ currentMove }} won!</h3>
+        <h3 v-if="winner">{{ winner }} won!</h3>
+        <h3 v-if="!winner">Draw!</h3>
         <button @click="restart" class="button-4" role="button">Restart</button>
 
     </div>
